@@ -7,10 +7,13 @@ def add_contact():
     phno=input("Enter the phone number: ")
     if not phno.isdigit() or len(phno)!=10:
         print("enter valid phone number")
+        return
     if check_names(fname,lname):
         print("the names already exists")
+        return
     if check_number(phno):
         print("the number already exists")
+        return 
     if not check_names(fname , lname) and not check_number(phno):
         with open(contact,'a') as file:
             file.write(f'{fname},{lname},{phno}\n')
@@ -21,13 +24,8 @@ def display_contact_info():
             if len(parts)!=3:
                 continue
             fname,lname,phno=parts
-            if check_names(fname,lname):
-                continue
-            if check_number(phno):
-                continue
-            if not check_names(fname , lname) and not check_number(phno):
-                print(f"{fname} {lname}")
-                print(f"{phno}")
+            print(f"{fname} {lname}")
+            print(f"{phno}")
 def check_names(fn,ln):
     if os.path.getsize(contact)==0:
             return False
@@ -50,6 +48,43 @@ def check_number(ph):
             if ph==phno:
                 return True
     return False
+def search_contact():
+    fn=input("enter the first name of the conatct: ")
+    ln=input("enter the lasr name of the conatct: ")
+    found=False
+    with open(contact,'r') as file:
+        for line in file:
+            parts=line.strip().split(',')
+            if len(parts)!=3:
+                continue
+            fname,lname,phno=parts
+            if fname==fn or lname==ln:
+                print(f"{fname} {lname}")
+                print(f"{phno}")
+                found=True
+        if not found:
+            print("Contact not found")
 
-add_contact()
-display_contact_info()
+def main():
+    while True:
+        print("1-Add Contacts")
+        print("2-Search Conatcts")
+        print("3-Display conatcts")
+        print("4-Exit")
+        try:
+            num=int(input("Please give the number based on above choices"))
+        except ValueError:
+            print("enter valid number")
+            continue
+        if num==1:
+            add_contact()
+        elif num==2:
+            search_contact()
+        elif num==3:
+            display_contact_info()
+        elif num==4:
+            print("Exiting Contact Manager")
+            break
+        else:
+            print("Please enter the valid number")
+main()
