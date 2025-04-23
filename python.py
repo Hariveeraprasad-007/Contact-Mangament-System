@@ -1,5 +1,6 @@
 
 import os
+import csv
 contact='Contact.txt'
 def add_contact():
     fname=input("Enter first name of the contact: ")
@@ -17,7 +18,7 @@ def add_contact():
     if not check_names(fname , lname) and not check_number(phno):
         with open(contact,'a') as file:
             file.write(f'{fname},{lname},{phno}\n')
-def display_contact_info():
+def display_all_contacts():
     with open(contact,'r') as file:
         for line in file:
             parts=line.strip().split(',')
@@ -49,8 +50,7 @@ def check_number(ph):
                 return True
     return False
 def search_contact():
-    fn=input("enter the first name of the conatct: ")
-    ln=input("enter the lasr name of the conatct: ")
+    search_name=input("enter the name of the contact: ")
     found=False
     with open(contact,'r') as file:
         for line in file:
@@ -58,14 +58,15 @@ def search_contact():
             if len(parts)!=3:
                 continue
             fname,lname,phno=parts
-            if fname==fn or lname==ln:
+            name=f'{fname} {lname}'
+            if name==search_name:
                 print(f"{fname} {lname}")
                 print(f"{phno}")
                 found=True
         if not found:
             print("Contact not found")
 def search_by_number():
-    ph=input("please enter the number")
+    ph=input("please enter the number: ")
     found=False
     if not ph.isdigit() or len(ph)!=10:
         print("enter valid phone number")
@@ -82,16 +83,93 @@ def search_by_number():
                 found=True
     if not found:
         print("The contact is not found")
-
+def remove_contact_by_name():
+    na=input("enter the full name in {fname} {lname} these format: ")
+    found=False
+    with open(contact,'r') as file:
+        lines =file.readlines()
+    with open(contact,'w') as file:
+        for line in lines:
+            parts=line.strip().split(',')
+            if len(parts)==3:
+                fname,lname,_=parts
+                name=f'{fname} {lname}'
+                if na!=name:
+                   file.write(line)
+                else:
+                   found=True
+    if found:
+        print("Contact is removed succesfully")
+    else:
+        print("conatct name is not found")
+def remove_contact_by_number():
+    ph=input("please enter the phone number: ")
+    found=False
+    with open(contact,'r') as file:
+        lines =file.readlines()
+    with open(contact,'w') as file:
+        for line in lines:
+            parts=line.strip().split(',')
+            if len(parts)==3:
+                _,_,phno=parts
+                if ph!=phno:
+                    file.write(line)
+                else:
+                    found=True
+    if found:
+        print("Contact is removed succesfully")
+    else:
+        print("conatct's number is not found")
+def update_contact():
+    name_to_update=input("please enter the name({fname} {lname}) of the conatct to be updated: ")
+    found=False
+    with open(contact,'r') as file:
+        lines=file.readlines() 
+    with open(contact,'w')  as file:
+        for line in lines:
+            parts=line.strip().split(',')
+            if len(parts)==3:
+                fname,lname,_=parts
+                name=f'{fname} {lname}'
+                if name==name_to_update:
+                    new_fname=input("enetr the new first name: ")
+                    new_lname=input("enter the new last name: ")
+                    new_phno=input("eneter the new phno number: ")
+                    if not new_phno.isdigit() or len(new_phno) != 10:
+                        print("Enter a valid phone number")
+                        return
+                    else:
+                        file.write(f'{new_fname},{new_lname},{new_phno}\n')
+                        found=True
+                else:
+                    file.write(line)
+    if found:
+        print("Contact updated succesfully")
+    else:
+        print("The name is not found")
+csv_file='contacts.csv'
+def export_as_csv():
+    with open(contact,'r') as file,open(csv_file,'w') as csvfile:
+        writer=csv.writer(csvfile)
+        writer.writerow(['First Name','Last Name','Phone Number'])
+        for lines in file:
+            parts=lines.strip().split(',')
+            if len(parts)==3:
+                writer.writerow(parts)
+    print("Contact are exported as csv file")
 def main():
     while True:
         print("1-Add Contacts")
         print("2-Search Conatcts")
         print("3-Display conatcts")
         print("4-Search By Number")
-        print("5-Exit")
+        print("5-Remove conatct by number")
+        print("6-Remove conact by name")
+        print("7-Update Contact")
+        print("8-Export as csv file")
+        print("9-Exit")
         try:
-            num=int(input("Please give the number based on above choices"))
+            num=int(input("Please give the number based on above choices: "))
         except ValueError:
             print("enter valid number")
             continue
@@ -100,10 +178,18 @@ def main():
         elif num==2:
             search_contact()
         elif num==3:
-            display_contact_info()
+            display_all_contacts()
         elif num==4:
             search_by_number()
         elif num==5:
+            remove_contact_by_number()
+        elif num==6:
+            remove_contact_by_name()
+        elif num==7:
+            update_contact()
+        elif num==8:
+            export_as_csv()
+        elif num==9:
             print("Exiting Contact Manager")
             break
         else:
