@@ -6,6 +6,8 @@ def add_contact():
     fname=input("Enter first name of the contact: ")
     lname=input("Enter last name of the contact: ")
     phno=input("Enter the phone number: ")
+    event_name=input("enter the event name: ")
+    event_date=input("enter the event date: ")
     if not phno.isdigit() or len(phno)!=10:
         print("enter valid phone number")
         return
@@ -17,25 +19,26 @@ def add_contact():
         return 
     if not check_names(fname , lname) and not check_number(phno):
         with open(contact,'a') as file:
-            file.write(f'{fname},{lname},{phno}\n')
+            file.write(f'{fname},{lname},{phno},{event_name},{event_date}\n')
 def display_all_contacts():
     with open(contact,'r') as file:
         for line in file:
             parts=line.strip().split(',')
-            if len(parts)!=3:
+            if len(parts)!=5:
                 continue
-            fname,lname,phno=parts
+            fname,lname,phno,event_name,event_date=parts
             print(f"{fname} {lname}")
             print(f"{phno}")
+            print(f"{event_name} {event_date}")
 def check_names(fn,ln):
     if os.path.getsize(contact)==0:
             return False
     with open(contact,'r') as file:
         for line in file:
             parts=line.strip().split(',')
-            if len(parts)!=3:
+            if len(parts)!=5:
                 continue
-            fname,lname,_=parts
+            fname,lname,_,_,_=parts
             if fname==fn and lname==ln:
                 return True
     return False
@@ -43,9 +46,9 @@ def check_number(ph):
     with open(contact,'r') as file:
         for line in file:
             parts=line.strip().split(',')
-            if len(parts)!=3:
+            if len(parts)!=5:
                 continue
-            _, _,phno=parts
+            _, _,phno,_,_=parts
             if ph==phno:
                 return True
     return False
@@ -55,13 +58,14 @@ def search_contact():
     with open(contact,'r') as file:
         for line in file:
             parts=line.strip().split(',')
-            if len(parts)!=3:
+            if len(parts)!=5:
                 continue
-            fname,lname,phno=parts
+            fname,lname,phno,event_name,event_date=parts
             name=f'{fname} {lname}'
             if name==search_name:
                 print(f"{fname} {lname}")
                 print(f"{phno}")
+                print(f"{event_name} {event_date}")
                 found=True
         if not found:
             print("Contact not found")
@@ -74,12 +78,13 @@ def search_by_number():
     with open(contact,'r') as file:
         for line in file:
             parts=line.strip().split(',')
-            if len(parts)!=3:
+            if len(parts)!=5:
                 continue
-            fname,lname,phno=parts
+            fname,lname,phno,event_name,event_date=parts
             if phno==ph:
                 print(f"{fname} {lname}")
                 print(f"{phno}")
+                print(f"{event_name} {event_date}")
                 found=True
     if not found:
         print("The contact is not found")
@@ -91,8 +96,8 @@ def remove_contact_by_name():
     with open(contact,'w') as file:
         for line in lines:
             parts=line.strip().split(',')
-            if len(parts)==3:
-                fname,lname,_=parts
+            if len(parts)==5:
+                fname,lname,_,_,_=parts
                 name=f'{fname} {lname}'
                 if na!=name:
                    file.write(line)
@@ -110,8 +115,8 @@ def remove_contact_by_number():
     with open(contact,'w') as file:
         for line in lines:
             parts=line.strip().split(',')
-            if len(parts)==3:
-                _,_,phno=parts
+            if len(parts)==5:
+                _,_,phno,_,_=parts
                 if ph!=phno:
                     file.write(line)
                 else:
@@ -121,25 +126,27 @@ def remove_contact_by_number():
     else:
         print("conatct's number is not found")
 def update_contact():
-    name_to_update=input("please enter the name({fname} {lname}) of the conatct to be updated: ")
+    name_to_update=input("please enter the name({fname} {lname}) of the conatct to be updated: ").strip()
     found=False
     with open(contact,'r') as file:
         lines=file.readlines() 
     with open(contact,'w')  as file:
         for line in lines:
             parts=line.strip().split(',')
-            if len(parts)==3:
-                fname,lname,_=parts
+            if len(parts)==5:
+                fname,lname,_,_,_=parts
                 name=f'{fname} {lname}'
                 if name==name_to_update:
                     new_fname=input("enetr the new first name: ")
                     new_lname=input("enter the new last name: ")
                     new_phno=input("eneter the new phno number: ")
+                    event_name=input("enter the new event name")
+                    event_date=input("enter the new event date")
                     if not new_phno.isdigit() or len(new_phno) != 10:
                         print("Enter a valid phone number")
                         return
                     else:
-                        file.write(f'{new_fname},{new_lname},{new_phno}\n')
+                        file.write(f'{new_fname},{new_lname},{new_phno},{event_name},{event_date}\n')
                         found=True
                 else:
                     file.write(line)
@@ -149,12 +156,12 @@ def update_contact():
         print("The name is not found")
 csv_file='contacts.csv'
 def export_as_csv():
-    with open(contact,'r') as file,open(csv_file,'w') as csvfile:
+    with open(contact,'r') as file,open(csv_file,'w',new_line='') as csvfile:
         writer=csv.writer(csvfile)
-        writer.writerow(['First Name','Last Name','Phone Number'])
+        writer.writerow(['First Name','Last Name','Phone Number','Event Name','Event Date'])
         for lines in file:
             parts=lines.strip().split(',')
-            if len(parts)==3:
+            if len(parts)==5:
                 writer.writerow(parts)
     print("Contact are exported as csv file")
 def main():
